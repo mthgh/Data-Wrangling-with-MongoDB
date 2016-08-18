@@ -82,13 +82,13 @@ tag keys having one colon: Element[k_first_section] = {k_second_section:v}
 tag keys having two colon: Element[k_first_section] = {k_second_section:{third_section:v}}
  
 example:
-                                                                                 {...
-&lt;tag k="addr:street:name" v="Lincoln"/&gt       should be turned into:         "addr": {
-&lt;tag k="amenity" v="pharmacy"/&gt                                                       "housenumber": 5158,
-&lt;tag k="addr:housenumber" v="5158"/&gt                                                  "street": {"name":"Lincoln"},
-                                                                                          }
-                                                                                  "amenity": "pharmacy",
-                                                                                 ...}
+                                                                            {...
+&lt;tag k="addr:street:name" v="Lincoln"/&gt       should be turned into:        "addr": {
+&lt;tag k="amenity" v="pharmacy"/&gt                                                      "housenumber": 5158,
+&lt;tag k="addr:housenumber" v="5158"/&gt                                                 "street": {"name":"Lincoln"},
+                                                                                    }
+                                                                            "amenity": "pharmacy",
+                                                                            ...}
 </pre>
  
  
