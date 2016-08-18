@@ -50,9 +50,15 @@ First, a distribition of the count of the tag keys were calculated (stored in "d
 'num of keys count more than 86 times (0.00001*total_count) = 322',  
 'num of keys count more than 8 times (0.000001*total_count) = 593'  
 ```
-Based on the result, only keys appear more than 0.00001*total_count times (86 times) will be processed. The other keys are so rare, or they might have the meaning with one of the keys appear more often. For example, "alt_name_1" which appear 4 times most likely to have the same meaning as "alt_name" (appear 1442 times). Also, something like "to" (appear 57 times) is ambiguous and something like "name:wa" (appear 1 time) is so rare.
+Based on the result, only keys appear more than 0.00001*total_count times (86 times) will be processed (stored inside variable "keys_v1"). The other keys are so rare, or they might have the meaning with one of the keys appear more often. For example, "alt_name_1" which appear 4 times most likely to have the same meaning as "alt_name" (appear 1442 times). Also, something like "to" (appear 57 times) is ambiguous and something like "name:wa" (appear 1 time) is so rare.  
 
- 
+Second, for the 322 tag keys that appear more than 86 times (stored inside variable "keys_v1"), they are compared with common standard keys from  http://wiki.openstreetmap.org/wiki/Map_Features (the standard keys on this web page were crawled using "Beautifulsoup" lib and stored inside "official_keySet" variable). Of the 322 tag keys, 102 of them exists as standard keys and will be processed without change, the other 220 keys (stored inside "key_need_check" variable) will need further fix.
+
+Third, for the other 220 keys need to check, their types were investigated (if they contain colon, if they contain specific characters, etc), the result was stored in "prob_key_types" variable. Based on the findings, for keys only contain lower case characters, if they appear more than 0.0001\*total_count times (863 times), they are saved. For keys contain colon, they are saved if the first part before the colon was a standard key (except the meaning of the second part is ambigous), or if the first part appear more than 0.0001\*total_count times (863 times) on average. Some of the keys are problematic, like "cityracks.housenum", in this case, the dot was changed to colon to keep consistency. of the 220 keys, the saved keys were stored in "fixed_key" variable. (The combined fix from this paragraph and last paragraph were stored in "keys_v2" variable)
+
+Fourth, it was found that something like "building" and "building:levels" both exist. Such keys exist both as itself and as the first part in a colon-containing key. This will bring trouble to process into a dictionary because of the key confilict (cannot have dict[building] = value and dict[building] = {"levels":value} both exist). Therefore, for such keys, they are changed to "keys:keys" format (for example, "building" changed to "building:building")
+
+After all the four steps fix, the final keys and the counts were stored in "final_keys" variable. old key to new key mapping was stored in "key_map" variable, it could also be found in data/key_map.txt. 
  
  
  
