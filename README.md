@@ -5,6 +5,7 @@
     1. [overview of the dataset] (#count)
     2. [problematic tag keys] (#fix_tagkey)
     3. [put to mongodb] (#putDB)
+    4. [problematic addr:state] (#fix_state)
 3. [Data Overview] (#overview)
 4. [Additional Ideas] (#addtional)
 
@@ -53,7 +54,7 @@ First, a distribition of the count of the tag keys were calculated (stored in "d
 ```
 Based on the result, only keys appear more than 0.00001*total\_count times (86 times) will be processed (stored inside variable "keys\_v1"). The other keys are so rare, or they might have the meaning with one of the keys appear more often. For example, "alt\_name\_1" which appear 4 times most likely to have the same meaning as "alt_name" (appear 1442 times). Also, something like "to" (appear 57 times) is ambiguous and something like "name:wa" (appear 1 time) is so rare.  
 
-Second, for the 322 tag keys that appear more than 86 times (stored inside variable "keys\_v1"), they are compared with common standard keys from  http://wiki.openstreetmap.org/wiki/Map_Features (the standard keys on this web page were crawled using "Beautifulsoup" lib and stored inside "official\_keySet" variable). Of the 322 tag keys, 102 of them exists as standard keys and will be processed without change, the other 220 keys (stored inside "key\_need_check" variable) will need further fix.
+Second, for the 322 tag keys that appear more than 86 times (stored inside variable "keys\_v1"), they are compared with common standard keys from  http://wiki.openstreetmap.org/wiki/Map_Features (the standard keys on this web page were crawled using "BeautifulSoup" lib and stored inside "official\_keySet" variable). Of the 322 tag keys, 102 of them exists as standard keys and will be processed without change, the other 220 keys (stored inside "key\_need_check" variable) will need further fix.
 
 Third, for the other 220 keys need to check, their types were investigated (if they contain colon, if they contain specific characters, etc), the result was stored in "prob\_key\_types" variable. Based on the findings, for keys only contain lower case characters, if they appear more than 0.0001\*total\_count times (863 times), they are saved. For keys contain colon, they are saved if the first part before the colon was a standard key (except the meaning of the second part is ambigous), or if the first part appear more than 0.0001\*total\_count times (863 times) on average. Some of the keys are problematic, like "cityracks.housenum", in this case, the dot was changed to colon to keep consistency. of the 220 keys, the saved keys were stored in "fixed\_key" variable. (The combined fix from this paragraph and last paragraph were stored in "keys_v2" variable)
 
@@ -90,8 +91,10 @@ example:
                                                                             "amenity": "pharmacy",
                                                                             ...}
 </pre>
- 
- 
+### 
+### <a name="fix_state">iv. problematic addr:state
+```fix_state.py``` was used to audit the "addr:state" field and fix the state values. Using ```fix_state.py```, distinct values of "addr.state" in the database were obtained (stored in "dist_state"). It was found that the state names exist in several different forms, like "New York", "NJ - New Jersey", "ct", etc. To make the values consistent, these forms were all converted to the abbrevation of the corresponding state with upper letters, ie, "NY", "NJ" and "CT".   
+Also, unexpected state names like "ON", "BY", "TX", "CA", "10009" and so on were found. The corresponding instances were extracted from the database and turns out that the state names were all mistake inputs caused by user. Therefore, they were updated to the right names ("NY", "NJ", or "CT"). 
  
  
 
