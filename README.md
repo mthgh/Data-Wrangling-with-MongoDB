@@ -6,6 +6,7 @@
     2. [problematic tag keys] (#fix_tagkey)
     3. [put to mongodb] (#putDB)
     4. [problematic addr:state] (#fix_state)
+    5. [problematic addr:city] (#fix_city)
 3. [Data Overview] (#overview)
 4. [Additional Ideas] (#addtional)
 
@@ -95,7 +96,9 @@ example:
 ### <a name="fix_state">iv. problematic addr:state
 ```fix_state.py``` was used to audit the "addr:state" field and fix the state values. Using ```fix_state.py```, distinct values of "addr.state" in the database were obtained (stored in "dist_state"). It was found that the state names exist in several different forms, like "New York", "NJ - New Jersey", "ct", etc. To make the values consistent, these forms were all converted to the abbrevation of the corresponding state with upper letters, ie, "NY", "NJ" and "CT".   
 Also, unexpected state names like "ON", "BY", "TX", "CA", "10009" and so on were found. The corresponding instances were extracted from the database and turns out that the state names were all mistake inputs caused by user. Therefore, they were updated to the right names ("NY", "NJ", or "CT"). 
- 
+### <a name="fix_city">v. problematic addr:city
+```fix_city.py``` was used to audit the "addr:city" field and fix the city values. Upon getting the distinct city names (stored in "dist_city"), it was found that some of the city names contain state or postcode infomations. For example, "Merrick, New York", 'New Brunswick, NJ 08901', 'Fresh Meadows NY' and so on exist. In order to fix, these values were updated to the correct city name, and the state or postcode infos were also moved the right field("addr:state" and "addr:postcode").  
+Also, the city names were compared to the standard town database (could be found in folder "data/US\_town.txt". This txt file was downloaded from http://download.geonames.org/export/dump/ as tab-delimited text, a discription of the database could be found on the website as well), the standard town names were processed into a variable "ny\_town". 45 of the 412 city names could not be found from "ny\_town". some of them are due to typos, like "Brookklyn" (should be "Brooklyn"), some are not in the right format, like "Hasbrouck Hts" (should be "Hasbrouck Heights"), some are valid names but not in the processed standard town database, like "Bronx" (in this work, the value for the "feature class" field processed is "P", but "Bronx" is in "A" catagory, see description of the database for detail), others are ambigous, like "M", "2", etc.The problematic city names were either updated, kept unchanged, or deleted. Final mapping of original city name to the updated city name could be found in variable "city_map"
  
 
 
