@@ -135,12 +135,12 @@ It was expected that postcode should be five digit numbers. However, it was foun
 Other unexpected postcodes including something like '100014' (should be "10014"), which is due to typos; 'New York, NY 10065' (should be "10065") which contain redundant info; '40299', which is not a valid postcode in NJ, NY or CT (https://en.wikipedia.org/wiki/List_of_ZIP_code_prefixes); "(718) 778-0140", which is abviously a phone number instead of postcode. Such problematic postcodes were all corrected (in the case of invalid postcode like "40299", they are deleted).
 
 The mapping of old postcodes to new postcodes were stored in "postcode_map" variable.
-### <a name="fix_housenumber"viii. problematic addr:housenumber
+### <a name="fix_housenumber>"viii. problematic addr:housenumber
 ```fix_housenumber.py``` was used to audit the "addr:housenumber" field and fix the housenumber values.
 
-First, it was found that in some cases, the "addr.housenumber" field has a value, but the "addr.street" field does not have values. Such housenumbers exist without any street names. They were considered invalid and were deleted (except in cases where the housenumber include street names, like '359 van Brunt'. In such cases, the correct housenumber ("359") were extracted and the street names ('Van Brunt') were put to "addr.street" field, mapping is stored in "housenumber\_map\_1").
+First, it was found that in some cases, the "addr.housenumber" field has a value, but the "addr.street" field does not have values. Such housenumbers exist without any street names. They were considered invalid and were deleted (except in cases where the housenumber include street names, like '359 van Brunt'. In such cases, the correct housenumber ("359") were extracted and the street names ('Van Brunt') were put to "addr.street" field, mapping is stored in variable "housenumber\_map\_1").
 
-Second, it was found that in the field of "addr.housenumber", values like '502 9th Avenue', '30 Vesey St' and so on exists. Such values were a mix of housenumber and street names. To fix such values, housenumbers were kept and street names were moved to the correct field ("addr.street"). The mapping is stored in "housenumber\_map\_2"
+Second, it was found that in the field of "addr.housenumber", values like '502 9th Avenue', '30 Vesey St' and so on exists. Such values were a mix of housenumber and street names. To fix such values, housenumbers were kept and street names were moved to the correct field ("addr.street"). The mapping is stored in variable "housenumber\_map\_2"
 
 
  
