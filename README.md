@@ -147,7 +147,7 @@ Second, it was found that in the field of "addr.housenumber", values like '502 9
 
 153 distinct amenity values exist (stored in "dist\_amenity" variable). After checking all the values, several problems were found: First, some values have the same meaning, like 'waste\_disposal' and "waste\_basket" both exist and they have the same meaning. To fix, 'waste\_disposal' was converted to "waste\_basket" since the latter one appear more times. Second, some values were misunderstanding, like 'user\_defined', 'school;place\_of\_worship', etc. they were either deleted (formal case), or updated (latter case,'school;place\_of\_worship' convert to 'school' according to detailed descriptions in this piece of data). Third, some of the values do not have the right format or contain typos, like "Liquor\_Store", 'Family health clinic', 'pakring', etc. They were converted to the right format ("liquor\_store", 'family\_health\_clinic' and 'parking' respectively).The mapping of the change was stored in "amenity_map" variable.
 ### <a name="json">x. output to json
-```to_json.py``` was used to output the data from mongodb datadase to json file.
+cmd command ```mongoexport -d osm -c NY_osm -o NY.json``` was used to export the mongodb dataset to json file.
 
 
  
