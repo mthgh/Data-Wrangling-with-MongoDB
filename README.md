@@ -141,6 +141,10 @@ The mapping of old postcodes to new postcodes were stored in "postcode_map" vari
 First, it was found that in some cases, the "addr.housenumber" field has a value, but the "addr.street" field does not have values. Such housenumbers exist without any street names. They were considered invalid and were deleted (except in cases where the housenumber include street names, like '359 van Brunt'. In such cases, the correct housenumber ("359") were extracted and the street names ('Van Brunt') were put to "addr.street" field, mapping is stored in variable "housenumber\_map\_1").
 
 Second, it was found that in the field of "addr.housenumber", values like '502 9th Avenue', '30 Vesey St' and so on exists. Such values were a mix of housenumber and street names. To fix such values, housenumbers were kept and street names were moved to the correct field ("addr.street"). The mapping is stored in variable "housenumber\_map\_2"
+### <a name="fix_amenity">viiii. problematic amenity
+```fix_amenity.py``` was used to audit the "amenity" field and fix the amenity values.
+
+153 distinct amenity values exist (stored in "dist\_amenity" variable). After checking all the values, several problems were found: First, some values have the same meaning, like 'waste\_disposal' and "waste\_basket" both exist and they have the same meaning. To fix, 'waste\_disposal' was converted to "waste\_basket" since the latter one appear more times. Second, some values were misunderstanding, like 'user\_defined', 'school;place\_of\_worship', etc. they were either deleted (formal case), or updated (latter case,'school;place\_of\_worship' convert to 'school' according to detailed descriptions in this piece of data). Third, some of the values do not have the right format or contain typos, like "Liquor\_Store", 'Family health clinic', 'pakring', etc. They were converted to the right format ("liquor\_store", 'family\_health\_clinic' and 'parking' respectively).The mapping of the change was stored in "amenity_map" variable.
 
 
  
