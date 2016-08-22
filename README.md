@@ -8,6 +8,9 @@
     4. [problematic addr:state] (#fix_state)
     5. [problematic addr:city] (#fix_city)
     6. [problematic addr:street] (#fix_street)
+    7. [problematic addr:postcode] (#fix_postcode)
+    8. [problematic addr:housenumber] (#fix_housenumber)
+    9. [problematic amenity] (#fix_amenity)
 3. [Data Overview] (#overview)
 4. [Additional Ideas] (#addtional)
 
@@ -124,6 +127,14 @@ Sixth, some street names do not have the right number format, like '7 Avenue', '
 Seventh, it was found that some street names start with directions ("East", "West", etc). For street names starting with directions, some of them have full direction, like 'East 73rd Street', some of them have abbreviated directions, like 'E 73rd Street'. To fix, the abbreviated directions were converted to full word ('E 73rd Street' to "East 73Rd Street").
 
 The mapping of the original street names to the new street names were stored in "street_map"
+### <a name="fix_postcode">vii. problematic addr:postcode
+```fix_postcode.py``` was used to audit the "addr:postcode" field and fix the postcode values.
+
+It was expected that postcode should be five digit numbers. However, it was found that nine digit postcode exist ('11201-2483'), and postcode with state info exist ('NY 10533'). To fix, the nine digit postcodes were convert to five digit postcodes ('11201-2483' to '11201') and for postcodes with state info, the state info was deleted ('NY 10533' to '10533'). 
+
+Other unexpected postcodes including something like '100014' (should be "10014"), which is due to typos; 'New York, NY 10065' (should be "10065") which contain redundant info; '40299', which is not a valid postcode in NJ, NY or CT (https://en.wikipedia.org/wiki/List_of_ZIP_code_prefixes); "(718) 778-0140", which is abviously a phone number instead of postcode. Such problematic postcodes were all corrected (in the case of invalid postcode like "40299", they are deleted).
+
+The mapping of old postcodes to new postcodes were stored in "dist_postcode" variable.
 
 
  
