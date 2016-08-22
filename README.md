@@ -24,7 +24,7 @@ This is the final project from udacity's online course "Data Wrangling with Mong
 
 ## <a name="clean"></a>2. Data Cleaning  
 ### <a name="count">i. overview of the dataset
-To get an idea of the size of the dataset, ```elem_count.py``` was used to count the element, attribute and tagkeys present in this dataset. With the result showing below. (Only node, way and the corresponding subelements will be processed)
+To get an idea of the size of the dataset, ```elem_count.py``` was used to count the element, attribute and tagkeys present in this dataset. With the result showing below. (Only node, way and the corresponding subelements will be processed later on to mongodb)
 
 <pre>
  Element Count:          Attrib Count:                          Total Number of Distinct Tagkeys: 1469
@@ -68,7 +68,7 @@ Fourth, it was found that something like "building" and "building:levels" both e
 
 After all the four steps fix, the final keys and the counts were stored in "final\_keys" variable. old key to new key mapping was stored in "key\_map" variable, it could also be found in data/key_map.txt. 
 ### <a name="putDB">iii. put to mongodb
-After initial fixation of the tag keys, the dataset was loaded into mongodb (Only Node, Way and respective sub-elements were loaded into database) using ```put_to_db.py``` for further cleaning. The following structure was used to import the dataset.
+After initial fixation of the tag keys, before further cleaning on other fields, the dataset was loaded into mongodb (Only Node, Way and respective sub-elements were loaded into database) using ```put_to_db.py```. The following structure was used to import the dataset.
 
 <pre>
 Node Elem:                                                Way Elem:
@@ -99,15 +99,17 @@ example:
 </pre>
 ### 
 ### <a name="fix_state">iv. problematic addr:state
-```fix_state.py``` was used to audit the "addr:state" field and fix the state values. Using ```fix_state.py```, distinct values of "addr.state" in the database were obtained (stored in "dist_state"). It was found that the state names exist in several different forms, like "New York", "NJ - New Jersey", "ct", etc. To make the values consistent, these forms were all converted to the abbrevation of the corresponding state with upper letters, ie, "NY", "NJ" and "CT". 
+```fix_state.py``` was used to audit the "addr:state" field and fix the state values. Using ```fix_state.py```, distinct values of "addr.state" in the database were obtained (stored in "dist_state" variable). It was found that the state names exist in several different forms, like "New York", "NJ - New Jersey", "ct", etc. To make the values consistent, these forms were all converted to the abbrevation of the corresponding state with upper letters, ie, "NY", "NJ" and "CT". 
 
 Also, unexpected state names like "ON", "BY", "TX", "CA", "10009" and so on were found. The corresponding instances were extracted from the database and turns out that the state names were all mistake inputs caused by user. Therefore, they were updated to the right names ("NY", "NJ", or "CT"). 
+
+The mapping of the old state name to new state name was stored in "state_map" variable.
 ### <a name="fix_city">v. problematic addr:city
 ```fix_city.py``` was used to audit the "addr:city" field and fix the city values. Upon getting the distinct city names (stored in "dist_city"), it was found that some of the city names contain state or postcode infomations. like "Merrick, New York", 'New Brunswick, NJ 08901', 'Fresh Meadows NY' and so on. In order to fix them, these values were updated to the correct city names, and the state or postcode info were also moved the right field("addr:state" and "addr:postcode").  
 
-The city names were also compared to the standard town database (could be found in folder "data/US\_town.txt". This txt file was downloaded from http://download.geonames.org/export/dump/ as tab-delimited text, a discription of the database could be found on the website as well), the standard town names were processed into a list variable "ny\_town". 45 of the 412 city names could not be found from "ny\_town". some of them are due to typos, like "Brookklyn" (should be "Brooklyn"), some are not in the right format, like "Hasbrouck Hts" (should be "Hasbrouck Heights"), some are valid names but not in "ny\_town" that was processed, like "Bronx" (in this work, the value for the "feature class" field processed is "P", but "Bronx" is in "A" catagory, see description of the database for detail), others are ambigous, like "M", "2", etc.The problematic city names were either updated, kept unchanged, or deleted. Final mapping of original city name to the updated city name could be found in variable "city_map"
+The city names were also compared to the standard town database (could be found in folder "data/US\_town.txt". This txt file was downloaded from http://download.geonames.org/export/dump/ as tab-delimited text, a discription of the database could be found on the website as well), the standard town names were processed into a variable "ny\_town" as a list. 45 of the 412 city names could not be found from "ny\_town". some of them are due to typos, like "Brookklyn" (should be "Brooklyn"), some are not in the right format, like "Hasbrouck Hts" (should be "Hasbrouck Heights"), some are valid names but not in "ny\_town" that was processed, like "Bronx" (in this work, the value for the "feature class" field processed is "P", but "Bronx" is in "A" catagory, see description of the database for detail), others are ambigous, like "M", "2", etc.The problematic city names were either updated, kept unchanged, or deleted. Final mapping of original city name to the updated city name could be found in variable "city_map"
 ### <a name="fix_street">vi. problematic addr:street
-```fix_street.py``` was used to audit the "addr:street" field and fix the street values.There are 9452 distinct street in this dataset. (stored in "dist_street"). 
+```fix_street.py``` was used to audit the "addr:street" field and fix the street values.There are 9452 distinct street in this dataset. (stored in "dist_street" variable). 
 
 First, street names were converted to a uniform format using "street_name.strip().title()".  
 
@@ -117,7 +119,7 @@ Third, it was found that in some cases, the street name suffixs were abbreviated
 
 Fourth, for the street names do not end with an "expected suffixs" ("Parkway", "Drive", "Expressway", etc), there are several cases:   
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;in one case, the street names contain the "expected suffix" in the middle instead of at the end and redundant info exist (like 'West 80th Street NYC 10024'). To fix, the redundant info were removed ('West 80th Street NYC 10024' to "West 80Th Street");  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;in second case, the street names were valid and they are highways, like 'NJ 35', 'NJ Route 35', 'South New Jersey 17Th South', 'State Route 36', 'US 1', 'US Highway 1 North', 'US Highway 1', etc. There are multiple formats of the highways. To make the format consistent, direction info were removed (remove "North", "South", etc), and only "State Route", "Route" and "US" were used before the numbers (the above sample highway names were converted to 'State Route 35', 'State Route 35', "State Route 17", 'State Route 36', 'Us 1', 'Us 1' and 'Us 1' respectively. See "street_map" and code for detail);  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;in second case, the street names were valid and they are highways, like 'NJ 35', 'NJ Route 35', 'South New Jersey 17Th South', 'State Route 36', 'US 1', 'US Highway 1 North', 'US Highway 1', etc. There are multiple formats of the highways. To make the format consistent, direction info were removed (remove "North", "South", etc), and only "State Route", "Route" and "Us" were used before the numbers (the above sample highway names were converted to 'State Route 35', 'State Route 35', "State Route 17", 'State Route 36', 'Us 1', 'Us 1' and 'Us 1' respectively. See "street_map" and code for detail);  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;in third case, street names are valid, like "Avenue Of Puerto Rico", they are saved without change;   
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;in fourth case, street names are not valid and they are deleted, like "Washington Square Village", 'ROAD 1', etc.
 
@@ -127,7 +129,7 @@ Sixth, some street names do not have the right number format, like '7 Avenue', '
 
 Seventh, it was found that some street names start with directions ("East", "West", etc). For street names starting with directions, some of them have full direction, like 'East 73rd Street', some of them have abbreviated directions, like 'E 73rd Street'. To fix, the abbreviated directions were converted to full word ('E 73rd Street' to "East 73Rd Street").
 
-The mapping of the original street names to the new street names were stored in "street_map"
+The mapping of the original street names to the updated street names were stored in variable "street_map"
 ### <a name="fix_postcode">vii. problematic addr:postcode
 ```fix_postcode.py``` was used to audit the "addr:postcode" field and fix the postcode values.
 
