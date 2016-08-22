@@ -103,7 +103,26 @@ Also, unexpected state names like "ON", "BY", "TX", "CA", "10009" and so on were
 
 The city names were also compared to the standard town database (could be found in folder "data/US\_town.txt". This txt file was downloaded from http://download.geonames.org/export/dump/ as tab-delimited text, a discription of the database could be found on the website as well), the standard town names were processed into a list variable "ny\_town". 45 of the 412 city names could not be found from "ny\_town". some of them are due to typos, like "Brookklyn" (should be "Brooklyn"), some are not in the right format, like "Hasbrouck Hts" (should be "Hasbrouck Heights"), some are valid names but not in "ny\_town" that was processed, like "Bronx" (in this work, the value for the "feature class" field processed is "P", but "Bronx" is in "A" catagory, see description of the database for detail), others are ambigous, like "M", "2", etc.The problematic city names were either updated, kept unchanged, or deleted. Final mapping of original city name to the updated city name could be found in variable "city_map"
 ### <a name="fix_street">vi. problematic addr:street
-```fix_street.py``` was used to audit the "addr:street" field and fix the street values.
+```fix_street.py``` was used to audit the "addr:street" field and fix the street values.There are 9452 distinct street in this dataset. (stored in "dist_street"). 
+
+First, street names were converted to a uniform format using "street_name.strip().title()".  
+
+Second, it was found that some street names contain unusual characters, like "#", ",", "\" and so on. Some of the characters were used to indicate alternative names, like "US 1 (Brunswick Pike)"; Some of them were used for housenumbers, like 'H Highway 34 #120'; Some are ambigous, like '37th Avenue, 14th Street, 21st Street'; Some of them were valid, but different formats exists, like "George's Road" and "Georges Road", they are the same road but with different formats. In order to fix, all special characters were removed to keep unification ("George's Road" convert to "Georges Road", "U.S. 1" convert to "Us 1", 'NJ-36' convert to "Nj 36", '102 St.' convert to "102 St", etc). Redundant info (like alternative names, housenumbers, etc) were removed. And if the street names were ambigous, they were deleted.  
+
+Third, it was found that in some cases, the street name suffixs were abbreviated (like "10th Ave"); in other cases, full suffixs were used (like '10th Avenue'); To fix the problem: for the formal case where the suffixs were abbreviated, they were converted to the full suffixs ('Harbor Dr' to "Harbor Drive", "10th Ave" to "10Th Avenue", etc).  
+
+Fouth, for the street names do not end with an "expected suffixs" ("Parkway", "Drive", "Expressway", etc), there are several cases:   
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;in one case, the street names contain the "expected suffix" in the middle instead of at the end and redundant info exist (like 'West 80th Street NYC 10024'). To fix, the redundant info were removed ('West 80th Street NYC 10024' to "West 80Th Street");  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;in second case, the street names were valid and they are highways, like 'NJ 35', 'NJ Route 35', 'South New Jersey 17Th South', 'State Route 36', 'US 1', 'US Highway 1 North', 'US Highway 1', etc. There are multiple formats of the highways. To make the format consistent, direction info were removed (remove "North", "South", etc), and only "State Route", "Route" and "US" were used before the numbers (the above sample highway names were converted to 'State Route 35', 'State Route 35', "State Route 17", 'State Route 36', 'Us 1', 'Us 1' and 'Us 1' respectively. See "street_map" and code for detail);  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;in third case, street names are valid, like "Avenue Of Puerto Rico", they are saved without change;   
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;in Forth case, street names are not valid and they are deleted, like "Washington Square Village", 'ROAD 1', etc.
+
+Fifty, some street names contain housenumber info at the front, like "40 W 94Th Street", '505Th 8Th Avenue'. In this case, the housenumber info were removed ("40 W 94Th Street" to "W 94Th Street"; '505Th 8Th Avenue' to "8Th Avenue").
+
+Sixth, some street names do not have the right number format, like '7 Avenue', '102 Street', 'Third Avenue', 'Fifth Avenue', etc. They were converted to '7Th Avenue', '102Th Street', '3Rd Avenue' and '5Th Avenue' respectively.
+
+Seventh, it was found that some street names start with directions ("East", "West", etc). For street names starting with directions, some of them have full direction, like 'East 73rd Street', some of them have abbreviated directions, like 'E 73rd Street'. To fix, the abbreviated directions were converted to full word ('E 73rd Street' to "East 73Rd Street").
+
 
  
 
