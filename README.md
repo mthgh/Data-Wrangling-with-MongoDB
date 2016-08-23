@@ -1,5 +1,5 @@
 # Fianl Project for Data Wrangling with MongoDB
-## Contents
+## Contents   
 1. [Project Summary] (#summary)
 2. [Data Cleaning] (#clean)
     1. [overview of the dataset] (#count)
