@@ -158,10 +158,90 @@ Second, it was found that in the field of "addr.housenumber", values like '502 9
 
 153 distinct amenity values exist (stored in "dist\_amenity" variable). After checking all the values, several problems were found: First, some values have the same meaning, like 'waste\_disposal' and "waste\_basket" both exist and they have the same meaning. To fix, 'waste\_disposal' was converted to "waste\_basket", since the latter one appear more times. Second, some values were misunderstanding, like 'user\_defined', 'school;place\_of\_worship', etc. they were either deleted (formal case), or updated (latter case,'school;place\_of\_worship' convert to 'school' according to detailed descriptions in this piece of data). Third, some of the values do not have the right format or contain typos, like "Liquor\_Store", 'Family health clinic', 'pakring', etc. They were converted to the right format ("liquor\_store", 'family\_health\_clinic' and 'parking' respectively).The mapping of the change was stored in "amenity_map" variable.
 ### <a name="json">x. output to json
-cmd command ```mongoexport -d osm -c NY_osm -o NY.json``` was used to export the mongodb dataset to json file.
-
-
- 
+cmd command ```mongoexport -d osm -c NY_osm -o ny.json``` was used to export the mongodb dataset to json file.
+## <a name="overview"></a>3. Data Overview
+Number of documents
+<pre>
+> db.NY_osm.find().count()
+10629466
+</pre>
+Number of nodes
+<pre>
+> db.NY_osm.find({"types":"node"}).count()
+9125861
+</pre>
+Number of ways
+<pre>
+> db.NY_osm.find({"types":"way"}).count()
+1503605
+</pre>
+Number of unique users
+<pre>
+> db.NY_osm.distinct("created.user").length
+3591
+</pre>
+Top 5 contributing user
+<pre>
+> db.NY_osm.aggregate([{"$group":{"_id":"$created.user",
+                                 "count":{"$sum":1}}},
+                      {"$sort":{"count":-1}},
+                      {"$limit":5}])
+{ "_id" : "Rub21_nycbuildings", "count" : 4891073 }
+{ "_id" : "ingalls_nycbuildings", "count" : 935873 }
+{ "_id" : "woodpeck_fixbot", "count" : 640476 }
+{ "_id" : "ediyes_nycbuildings", "count" : 272014 }
+{ "_id" : "lxbarth_nycbuildings", "count" : 234580 }
+</pre>
+Number of users contributing only once
+<pre>
+> db.NY_osm.aggregate([{"$group":{"_id":"$created.user",
+                                 "count":{"$sum":1}}},
+                      {"$group":{"_id":"$count",
+                                 "num_users":{"$sum":1}}},
+                      {"$sort":{"_id":1}},
+                      {"$limit":1}])
+{ "_id" : 1, "num_users" : 920 }
+</pre>
+Top 5 amenities:
+<pre>
+> db.NY_osm.aggregate([{"$match":{"amenity":{"$exists":1}}},
+                       {"$group":{"_id":"$amenity",
+                                  "count":{"$sum":1}}},
+                       {"$sort":{"count":-1}},
+                       {"$limit":5}])
+{ "_id" : "parking", "count" : 6774 }
+{ "_id" : "bicycle_parking", "count" : 4868 }
+{ "_id" : "school", "count" : 4693 }
+{ "_id" : "place_of_worship", "count" : 4641 }
+{ "_id" : "restaurant", "count" : 3154 }
+</pre>
+Top 5 postcodes:
+<pre>
+> db.NY_osm.aggregate([{"$match":{"addr.postcode":{"$exists":1}}},
+                       {"$group":{"_id":"$addr.postcode",
+                                  "count":{"$sum":1}}},
+                       {"$sort":{"count":-1}},
+                       {"$limit":5}])
+{ "_id" : "10314", "count" : 23066 }
+{ "_id" : "11234", "count" : 20139 }
+{ "_id" : "10312", "count" : 17841 }
+{ "_id" : "10306", "count" : 16186 }
+{ "_id" : "11236", "count" : 15225 }
+</pre>
+Top 5 cuisines:
+<pre>
+> db.NY_osm.aggregate([{"$match":{"amenity":"restaurant",
+                                  "cuisine":{"$exists":1}}},
+                       {"$group":{"_id":"$cuisine",
+                                  "count":{"$sum":1}}},
+                       {"$sort":{"count":-1}},
+                       {"$limit":5}])
+{ "_id" : "italian", "count" : 221 }
+{ "_id" : "american", "count" : 173 }
+{ "_id" : "pizza", "count" : 163 }
+{ "_id" : "mexican", "count" : 120 }
+{ "_id" : "chinese", "count" : 98 }
+</pre>
 
 
 
