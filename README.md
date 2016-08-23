@@ -20,7 +20,16 @@ This is the final project from udacity's online course "Data Wrangling with Mong
   
 **_Map Area : Great New York City Area_**  
 **_Open Street Map URL_**: https://www.openstreetmap.org/export#map=10/40.7202/-73.8638   
-**_Data Source (OSM XML)_**: https://mapzen.com/data/metro-extracts/metro/new-york_new-york/  
+**_Data Source (OSM XML)_**: https://mapzen.com/data/metro-extracts/metro/new-york_new-york/
+
+**_File Sizes_**:   
+ny.osm: 2.13GB  (original OSM XML file)  
+ny.json: 2.73GB (after converting original OSM XML file to json file)
+
+**_References_**:  
+- OSM tag keys: http://wiki.openstreetmap.org/wiki/Map_Features
+- US town names (US.zip): http://download.geonames.org/export/dump/
+- Prefix of postcodes: https://en.wikipedia.org/wiki/List_of_ZIP_code_prefixes
 
 ## <a name="clean"></a>2. Data Cleaning  
 ### <a name="count">i. overview of the dataset
