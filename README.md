@@ -175,6 +175,26 @@ Number of ways
 > db.NY_osm.find({"types":"way"}).count()
 1503605
 </pre>
+Nodes do not have tags:
+<pre>
+> cursor = collection.find({"types":"node"})
+> simple_node = 0
+> for doc in cursor: 
+      if len(doc) == 5:
+          simple_node += 1
+> simple_node 
+8811816
+</pre>
+Ways do not have tags:
+<pre>
+> cursor = collection.find({"types":"way"})
+> simple_way = 0
+> for doc in cursor: 
+      if len(doc) == 5:
+          simple_node += 1
+> simple_way 
+6703
+</pre>
 Number of unique users
 <pre>
 > db.NY_osm.distinct("created.user").length
@@ -256,4 +276,6 @@ Top 5 street names:
 { "_id" : "78Th Street", "count" : 2340 }
 </pre>
 ##<a name="addtional">4.Additional Ideas
+Since majority of "node" do not have tags (8811816/9125861=95.6%), which means the only useful info (if the application is mostly interested in "places" rather than who created the dataset) in such "nodes" is "pos" coordinates. Thus, it would be possible to incoorperate the "node" directly into "way", removing the "nd" field in way and removing all "node".
 
+Since the data is only from one source (OpenStreetMap) and it is user defined, it might be necessary to validate the dataset and fill in the missing data (street,postcode, etc) using other tools, like Google Maps APIs. 
