@@ -159,7 +159,7 @@ Second, it was found that in the field of "addr.housenumber", values like '502 9
 153 distinct amenity values exist (stored in "dist\_amenity" variable). After checking all the values, several problems were found: First, some values have the same meaning, like 'waste\_disposal' and "waste\_basket" both exist and they have the same meaning. To fix, 'waste\_disposal' was converted to "waste\_basket", since the latter one appear more times. Second, some values were misunderstanding, like 'user\_defined', 'school;place\_of\_worship', etc. they were either deleted (formal case), or updated (latter case,'school;place\_of\_worship' convert to 'school' according to detailed descriptions in this piece of data). Third, some of the values do not have the right format or contain typos, like "Liquor\_Store", 'Family health clinic', 'pakring', etc. They were converted to the right format ("liquor\_store", 'family\_health\_clinic' and 'parking' respectively).The mapping of the change was stored in "amenity_map" variable.
 ### <a name="json">x. output to json
 cmd command ```mongoexport -d osm -c NY_osm -o ny.json``` was used to export the mongodb dataset to json file.
-## <a name="overview"></a>3. Data Overview
+## <a name="overview">3. Data Overview
 Number of documents
 <pre>
 > db.NY_osm.find().count()
@@ -215,19 +215,6 @@ Top 5 amenities:
 { "_id" : "place_of_worship", "count" : 4641 }
 { "_id" : "restaurant", "count" : 3154 }
 </pre>
-Top 5 postcodes:
-<pre>
-> db.NY_osm.aggregate([{"$match":{"addr.postcode":{"$exists":1}}},
-                       {"$group":{"_id":"$addr.postcode",
-                                  "count":{"$sum":1}}},
-                       {"$sort":{"count":-1}},
-                       {"$limit":5}])
-{ "_id" : "10314", "count" : 23066 }
-{ "_id" : "11234", "count" : 20139 }
-{ "_id" : "10312", "count" : 17841 }
-{ "_id" : "10306", "count" : 16186 }
-{ "_id" : "11236", "count" : 15225 }
-</pre>
 Top 5 cuisines:
 <pre>
 > db.NY_osm.aggregate([{"$match":{"amenity":"restaurant",
@@ -242,6 +229,31 @@ Top 5 cuisines:
 { "_id" : "mexican", "count" : 120 }
 { "_id" : "chinese", "count" : 98 }
 </pre>
-
-
+Top 5 postcodes:
+<pre>
+> db.NY_osm.aggregate([{"$match":{"addr.postcode":{"$exists":1}}},
+                       {"$group":{"_id":"$addr.postcode",
+                                  "count":{"$sum":1}}},
+                       {"$sort":{"count":-1}},
+                       {"$limit":5}])
+{ "_id" : "10314", "count" : 23066 }
+{ "_id" : "11234", "count" : 20139 }
+{ "_id" : "10312", "count" : 17841 }
+{ "_id" : "10306", "count" : 16186 }
+{ "_id" : "11236", "count" : 15225 }
+</pre>
+Top 5 street names:
+<pre>
+> db.NY_osm.aggregate([{"$match":{"addr.street":{"$exists":1}}},
+                       {"$group":{"_id":"$addr.street",
+                                  "count":{"$sum":1}}},
+                       {"$sort":{"count":-1}},
+                       {"$limit":5}])
+{ "_id" : "Broadway", "count" : 3554 }
+{ "_id" : "3Rd Avenue", "count" : 2485 }
+{ "_id" : "5Th Avenue", "count" : 2474 }
+{ "_id" : "79Th Street", "count" : 2414 }
+{ "_id" : "78Th Street", "count" : 2340 }
+</pre>
+##<a name="addtional">4.Additional Ideas
 
